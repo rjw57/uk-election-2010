@@ -1,0 +1,12 @@
+!!! 5
+%html
+  %head
+    %title Constituency map
+    %link{ rel: 'stylesheet', href: 'style.css' }
+  %body
+    = yield
+
+    %script{ src: 'https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js' }
+    %script{ src: 'http://openlayers.org/api/OpenLayers.js' }
+    %script{ src: 'http://code.jquery.com/color/jquery.color-2.1.0.min.js' }
+    %script{ src: 'main.js' }
