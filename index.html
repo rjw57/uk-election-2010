@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>UK General Election 2010 Constituency Map</title>
+    <link href='style.css' rel='stylesheet' />
+  </head>
+  <body>
+    <div id='constituency-map'></div>
+    <div id='key'>
+      <p>
+        Each constituency is coloured according to the proportion of the vote
+        received by each party: Conservative, Labour, Liberal Democrats and Others.
+      </p>
+      <table>
+        <tr>
+          <td align='right'>Lab</td>
+          <td rowspan='2'>
+            <canvas id='colour-swatch'></canvas>
+          </td>
+          <td align='left'>LD</td>
+        </tr>
+        <tr valign='bottom'>
+          <td align='right'>Oth</td>
+          <td align='left'>Con</td>
+        </tr>
+      </table>
+    </div>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js'></script>
+    <script src='http://openlayers.org/api/OpenLayers.js'></script>
+    <script src='http://code.jquery.com/color/jquery.color-2.1.0.min.js'></script>
+    <script src='main.js'></script>
+  </body>
+</html>
