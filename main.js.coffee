@@ -93,6 +93,7 @@ $ ->
     projection: 'EPSG:4326'
     strategies: [new OpenLayers.Strategy.Fixed]
     displayInLayerSwitcher: false
+    attribution: 'Contains Ordnance Survey data &copy; Crown copyright and database right 2011.'
     protocol: new OpenLayers.Protocol.HTTP( url: 'constituencies_with_results.json', format: new OpenLayers.Format.GeoJSON )
 
   @vectorLayer.events.register 'loadend', null, () =>
