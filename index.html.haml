@@ -1,2 +1,15 @@
 #constituency-map
 
+#key
+  %p
+    Each constituency is coloured according to the proportion of the vote
+    received by each party: Conservative, Labour, Liberal Democrats and Others.
+  %table
+    %tr
+      %td{ align: 'right' } Lab
+      %td{ rowspan: 2 } 
+        %canvas#colour-swatch
+      %td{ align: 'left' } LD
+    %tr{ valign: 'bottom' }
+      %td{ align: 'right' } Oth
+      %td{ align: 'left' } Con
