@@ -3,6 +3,8 @@
   %head
     %title UK General Election 2010 Constituency Map
     %link{ rel: 'stylesheet', href: 'style.css' }
+    /[if lt IE 9]
+      %script(src="http://html5shiv.googlecode.com/svn/trunk/html5.js")
   %body
     = yield
 
