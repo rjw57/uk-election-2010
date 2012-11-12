@@ -32,6 +32,9 @@ body {
 #key table {
   margin: 0 auto;
 }
+#key table .label {
+  height: 66px;
+}
 #key legend {
   width: 100%;
   text-align: center;
@@ -46,8 +49,11 @@ body {
   font-size: 75%;
 }
 .colour-swatch {
+  display: block;
   width: 100px;
   height: 100px;
+  padding: 0;
+  margin: 0;
 }
 .olControlAttribution {
   bottom: 5px !important;
