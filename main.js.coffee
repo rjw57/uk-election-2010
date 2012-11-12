@@ -105,9 +105,14 @@ $ ->
   hoverStyle = new OpenLayers.Style
     fillColor: '#A3C1AD'
 
+  selectStyle = new OpenLayers.Style
+    strokeColor: '#0000ee'
+    strokeWidth: 3
+
   styles = {
     default: new OpenLayers.Style(defaultStyle, context: defaultContext)
     hover: hoverStyle
+    select: selectStyle
   }
 
   # Create the vector overlay layer
@@ -145,7 +150,7 @@ $ ->
 
   hoverFeature = null
   selectControl = new OpenLayers.Control.SelectFeature @vectorLayer,
-    renderIntent: 'hover', autoActivate: true
+    autoActivate: true
     onSelect: (f) =>
       hoverFeature = f
       description_html = '<h4>'+f.attributes.name+'</h4>'
