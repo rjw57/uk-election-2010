@@ -136,8 +136,13 @@ $ ->
       l2 += l2_
       l3 += l3_
       l4 += l4_
-    $('#popular-vote-caption').html('Con:&nbsp;' + l3 + ', Lab:&nbsp;' + l1 + ', LD:&nbsp;' + l2 + ', Oth:&nbsp;' + l4)
     s = l1+l2+l3+l4
+    $('#popular-vote-caption').html('<table>' +
+      '<tr><td align="right">Con:</td><td>' + l3 + '</td><td>(' + Math.round(100*l3/s) + '%)</td></tr>' +
+      '<tr><td align="right">Lab:</td><td>' + l1 + '</td><td>(' + Math.round(100*l1/s) + '%)</td></tr>' +
+      '<tr><td align="right">LD:</td><td>' + l2 + '</td><td>(' + Math.round(100*l2/s) + '%)</td></tr>' +
+      '<tr><td align="right">Oth:</td><td>' + l4 + '</td><td>(' + Math.round(100*l4/s) + '%)</td></tr>' +
+      '</table>')
     l1 /= s
     l2 /= s
     l3 /= s
