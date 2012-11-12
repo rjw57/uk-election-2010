@@ -157,13 +157,15 @@ $ ->
       description_html += '<table>'
 
       rows = []
+      sum = 0
       for own k,v of f.attributes.results
         rows.push([k,v])
+        sum += v
       rows.sort((a,b) -> b[1]-a[1])
       for i,r of rows
         k = r[0]
         v = r[1]
-        description_html += '<tr><td align="right">' + k + ':</td><td>' + v + '</td></tr>'
+        description_html += '<tr><td align="right">' + k + ':</td><td>' + v + '</td><td>(' + Math.round(100*v/sum) + '%)</td></tr>'
 
       description_html += '</table>'
       popup = new OpenLayers.Popup.FramedCloud 'hover-popup',
