@@ -80,7 +80,7 @@ $ ->
   }
 
   hoverStyle = new OpenLayers.Style
-    fillColor: '#339933'
+    fillColor: '#A3C1AD'
 
   styles = {
     default: new OpenLayers.Style(defaultStyle, context: defaultContext)
