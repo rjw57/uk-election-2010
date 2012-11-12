@@ -160,8 +160,8 @@
         l3 += l3_;
         l4 += l4_;
       }
-      $('#popular-vote-caption').html('Con:&nbsp;' + l3 + ', Lab:&nbsp;' + l1 + ', LD:&nbsp;' + l2 + ', Oth:&nbsp;' + l4);
       s = l1 + l2 + l3 + l4;
+      $('#popular-vote-caption').html('<table>' + '<tr><td align="right">Con:</td><td>' + l3 + '</td><td>(' + Math.round(100 * l3 / s) + '%)</td></tr>' + '<tr><td align="right">Lab:</td><td>' + l1 + '</td><td>(' + Math.round(100 * l1 / s) + '%)</td></tr>' + '<tr><td align="right">LD:</td><td>' + l2 + '</td><td>(' + Math.round(100 * l2 / s) + '%)</td></tr>' + '<tr><td align="right">Oth:</td><td>' + l4 + '</td><td>(' + Math.round(100 * l4 / s) + '%)</td></tr>' + '</table>');
       l1 /= s;
       l2 /= s;
       l3 /= s;
@@ -179,15 +179,27 @@
     selectControl = new OpenLayers.Control.SelectFeature(this.vectorLayer, {
       autoActivate: true,
       onSelect: function(f) {
-        var description_html, k, popup, v, _ref;
+        var description_html, i, k, popup, r, rows, sum, v, _ref;
         hoverFeature = f;
         description_html = '<h4>' + f.attributes.name + '</h4>';
         description_html += '<table>';
+        rows = [];
+        sum = 0;
         _ref = f.attributes.results;
         for (k in _ref) {
           if (!__hasProp.call(_ref, k)) continue;
           v = _ref[k];
-          description_html += '<tr><td align="right">' + k + ':</td><td>' + v + '</td></tr>';
+          rows.push([k, v]);
+          sum += v;
+        }
+        rows.sort(function(a, b) {
+          return b[1] - a[1];
+        });
+        for (i in rows) {
+          r = rows[i];
+          k = r[0];
+          v = r[1];
+          description_html += '<tr><td align="right">' + k + ':</td><td>' + v + '</td><td>(' + Math.round(100 * v / sum) + '%)</td></tr>';
         }
         description_html += '</table>';
         popup = new OpenLayers.Popup.FramedCloud('hover-popup', f.geometry.getBounds().getCenterLonLat(), null, description_html, null, true, function() {
