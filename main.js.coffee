@@ -84,8 +84,8 @@ $ ->
   @map.addLayer new OpenLayers.Layer.OSM
   @map.zoomToMaxExtent()
 
-  createColourSwatch $('canvas#colour-swatch-1'), [0,1,3,2]
-  createColourSwatch $('canvas#colour-swatch-2'), [0,1,2,3]
+  createColourSwatch $('canvas#colour-swatch-1'), [1,3,0,2]
+  createColourSwatch $('canvas#colour-swatch-2'), [0,2,3,1]
 
   defaultStyle = {
     fillColor: '${getFillColor}'

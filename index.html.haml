@@ -5,22 +5,19 @@
     Each constituency is coloured according to the proportion of the vote
     received by each party: Conservative, Labour, Liberal Democrats and Others.
   %table
-    %tr
-      %td{ align: 'right' } Lab
-      %td{ rowspan: 2 } 
-        %canvas.colour-swatch#colour-swatch-1
-      %td{ align: 'left' } LD
+    %tr{ valign: 'top' }
+      %td.label{ align: 'right' } LD
+      %td{ rowspan: 3 } 
+        .swatches
+          %canvas.colour-swatch#colour-swatch-1
+          %canvas.colour-swatch#colour-swatch-2
+      %td.label{ align: 'left' } Oth
+    %tr{ valign: 'middle' }
+      %td.label{ align: 'right' } Lab
+      %td.label{ align: 'left' } Con
     %tr{ valign: 'bottom' }
-      %td{ align: 'right' } Oth
-      %td{ align: 'left' } Con
-    %tr
-      %td{ align: 'right' } Lab
-      %td{ rowspan: 2 } 
-        %canvas.colour-swatch#colour-swatch-2
-      %td{ align: 'left' } LD
-    %tr{ valign: 'bottom' }
-      %td{ align: 'right' } Con
-      %td{ align: 'left' } Oth
+      %td.label{ align: 'right' } Oth
+      %td.label{ align: 'left' } LD
   %legend
     %a{ href: 'http://blog.richardallen.co.uk/uk-political-party-web-colours/' } UK Political Party Web Colours
   %p The popular vote is shown in the swatch below:
