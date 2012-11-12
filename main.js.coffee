@@ -14,8 +14,9 @@ barycentricCoordToColour = (l1, l2, l3) ->
   b = l1*t[0][2] + l2*t[1][2] + l3*t[2][2] + r4[2]
   [r,g,b]
 
-createColourSwatch = () ->
-  $('canvas#colour-swatch').each (idx, elem) =>
+# ordering give which barycentric co-ord corresponds to tl, tr, bl, br
+createColourSwatch = (elems, ordering = [0,1,3,2]) ->
+  elems.each (idx, elem) =>
     ctx = elem.getContext('2d')
     imageData = ctx.createImageData(ctx.canvas.width, ctx.canvas.height)
 
@@ -26,10 +27,22 @@ createColourSwatch = () ->
         s = 1
         nx = s*col/imageData.width
         ny = s*row/imageData.height
-        l1 = Math.max(0, 1-Math.sqrt(nx*nx + ny*ny))
-        l2 = Math.max(0, 1-Math.sqrt((s-nx)*(s-nx) + ny*ny))
-        l3 = Math.max(0, 1-Math.sqrt((s-nx)*(s-nx) + (s-ny)*(s-ny)))
-        l4 = Math.max(0, 1-Math.sqrt(nx*nx + (s-ny)*(s-ny)))
+
+        tl = Math.max(0, 1-Math.sqrt(nx*nx + ny*ny))
+        tr = Math.max(0, 1-Math.sqrt((s-nx)*(s-nx) + ny*ny))
+        br = Math.max(0, 1-Math.sqrt((s-nx)*(s-nx) + (s-ny)*(s-ny)))
+        bl = Math.max(0, 1-Math.sqrt(nx*nx + (s-ny)*(s-ny)))
+
+        l = [0,0,0,0]
+        l[ordering[0]] = tl
+        l[ordering[1]] = tr
+        l[ordering[2]] = bl
+        l[ordering[3]] = br
+
+        l1 = l[0]
+        l2 = l[1]
+        l3 = l[2]
+        l4 = l[3]
 
         n = l1+l2+l3+l4
         l1 /= n
@@ -71,7 +84,8 @@ $ ->
   @map.addLayer new OpenLayers.Layer.OSM
   @map.zoomToMaxExtent()
 
-  createColourSwatch t, r4
+  createColourSwatch $('canvas#colour-swatch-1'), [0,1,3,2]
+  createColourSwatch $('canvas#colour-swatch-2'), [0,1,2,3]
 
   defaultStyle = {
     fillColor: '${getFillColor}'
@@ -117,6 +131,7 @@ $ ->
       l2 += l2_
       l3 += l3_
       l4 += l4_
+    $('#popular-vote-caption').html('Con:&nbsp;' + l3 + ', Lab:&nbsp;' + l1 + ', LD:&nbsp;' + l2 + ', Oth:&nbsp;' + l4)
     s = l1+l2+l3+l4
     l1 /= s
     l2 /= s

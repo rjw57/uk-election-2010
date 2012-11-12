@@ -6,29 +6,36 @@ html, body { width: 100%; height: 100%; margin: 0; padding: 0 }
 }
 
 #key {
-  p {
-    text-align: justify;
-  }
-  table {
-    margin: 0 auto;
-  }
-
+  color: #ddd;
   z-index: 3000;
   position: absolute;
   right: 20px;
   top: 20px;
   width: 200px;
-  background-color: rgba(0,0,0,0.25);
+  background-color: rgba(0,0,0,0.75);
   border-radius: 5px;
   padding: 10px;
+
+  p {
+    text-align: justify;
+  }
+
+  table {
+    margin: 0 auto;
+  }
+
+  #popular-vote {
+    height: 1.7em;
+    background-color: black;
+  }
+
+  #popular-vote-caption {
+    text-align: center;
+    font-size: 75%;
+  }
 }
 
-#popular-vote {
-  height: 1.7em;
-  background-color: black;
-}
-
-#colour-swatch {
+.colour-swatch {
   width: 100px;
   height: 100px;
 }
