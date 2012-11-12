@@ -155,8 +155,16 @@ $ ->
       hoverFeature = f
       description_html = '<h4>'+f.attributes.name+'</h4>'
       description_html += '<table>'
+
+      rows = []
       for own k,v of f.attributes.results
+        rows.push([k,v])
+      rows.sort((a,b) -> b[1]-a[1])
+      for i,r of rows
+        k = r[0]
+        v = r[1]
         description_html += '<tr><td align="right">' + k + ':</td><td>' + v + '</td></tr>'
+
       description_html += '</table>'
       popup = new OpenLayers.Popup.FramedCloud 'hover-popup',
         f.geometry.getBounds().getCenterLonLat(),
