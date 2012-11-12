@@ -1,4 +1,20 @@
-createColourSwatch = (t, r4) ->
+# Colours
+r1 = [192,   0,   0]  # red
+r2 = [255, 210,   0]  # yellow
+r3 = [  0,   0, 192]  # blue
+r4 = [  0, 192,   0]  # green
+
+t = [[r1[0]-r4[0], r1[1]-r4[1], r1[2]-r4[2]],
+     [r2[0]-r4[0], r2[1]-r4[1], r2[2]-r4[2]],
+     [r3[0]-r4[0], r3[1]-r4[1], r3[2]-r4[2]]]
+
+barycentricCoordToColour = (l1, l2, l3) ->
+  r = l1*t[0][0] + l2*t[1][0] + l3*t[2][0] + r4[0]
+  g = l1*t[0][1] + l2*t[1][1] + l3*t[2][1] + r4[1]
+  b = l1*t[0][2] + l2*t[1][2] + l3*t[2][2] + r4[2]
+  [r,g,b]
+
+createColourSwatch = () ->
   $('canvas#colour-swatch').each (idx, elem) =>
     ctx = elem.getContext('2d')
     imageData = ctx.createImageData(ctx.canvas.width, ctx.canvas.height)
@@ -20,9 +36,7 @@ createColourSwatch = (t, r4) ->
         l2 /= n
         l3 /= n
 
-        r = l1*t[0][0] + l2*t[1][0] + l3*t[2][0] + r4[0]
-        g = l1*t[0][1] + l2*t[1][1] + l3*t[2][1] + r4[1]
-        b = l1*t[0][2] + l2*t[1][2] + l3*t[2][2] + r4[2]
+        [r,g,b] = barycentricCoordToColour l1, l2, l3
 
         imageData.data[idx+0] = r
         imageData.data[idx+1] = g
@@ -31,21 +45,31 @@ createColourSwatch = (t, r4) ->
     
     ctx.putImageData imageData, 0, 0
 
+# Return the barycentric (un-normalised or normalised) co-ordinates from a set of results
+resultsToBarycentric = (results, normalise=true) ->
+  l1 = l2 = l3 = l4 = 0
+
+  for own k,v of results
+    switch k
+      when 'Lab' then l1 += v
+      when 'LD'  then l2 += v
+      when 'Con' then l3 += v
+      else            l4 += v
+
+  if normalise
+    s = l1+l2+l3+l4
+    l1 /= s
+    l2 /= s
+    l3 /= s
+    l4 /= s
+
+  return [l1, l2, l3, l4]
+
 $ ->
   @map = new OpenLayers.Map 'constituency-map'
 
   @map.addLayer new OpenLayers.Layer.OSM
   @map.zoomToMaxExtent()
-
-  # Colours
-  r1 = [192,   0,   0]  # red
-  r2 = [255, 210,   0]  # yellow
-  r3 = [  0,   0, 192]  # blue
-  r4 = [  0, 192,   0]  # green
-
-  t = [[r1[0]-r4[0], r1[1]-r4[1], r1[2]-r4[2]],
-       [r2[0]-r4[0], r2[1]-r4[1], r2[2]-r4[2]],
-       [r3[0]-r4[0], r3[1]-r4[1], r3[2]-r4[2]]]
 
   createColourSwatch t, r4
 
@@ -59,23 +83,8 @@ $ ->
   defaultContext = {
     getFillColor: (f) =>
       results = f.attributes.results || {}
-
-      sum_vote = 0
-      for own k, v of results
-        sum_vote += v
-
-      con = results.Con || 0
-      lab = results.Lab || 0
-      ld = results.LD || 0
-
-      l1 = lab / sum_vote
-      l2 = ld / sum_vote
-      l3 = con / sum_vote
-
-      r = l1*t[0][0] + l2*t[1][0] + l3*t[2][0] + r4[0]
-      g = l1*t[0][1] + l2*t[1][1] + l3*t[2][1] + r4[1]
-      b = l1*t[0][2] + l2*t[1][2] + l3*t[2][2] + r4[2]
-
+      [l1, l2, l3, l4] = resultsToBarycentric results
+      [r, g, b] = barycentricCoordToColour l1, l2, l3
       return jQuery.Color(r,g,b).toHexString(false)
   }
 
@@ -98,6 +107,23 @@ $ ->
 
   @vectorLayer.events.register 'loadend', null, () =>
     @map.zoomToExtent @vectorLayer.getDataExtent()
+
+    # Calculate overall 'colour' of the country
+    l1 = l2 = l3 = l4 = 0
+    for f in @vectorLayer.features
+      results = f.attributes.results || {}
+      [l1_, l2_, l3_, l4_] = resultsToBarycentric results, false
+      l1 += l1_
+      l2 += l2_
+      l3 += l3_
+      l4 += l4_
+    s = l1+l2+l3+l4
+    l1 /= s
+    l2 /= s
+    l3 /= s
+    l4 /= s
+    [r, g, b] = barycentricCoordToColour l1, l2, l3
+    $('#popular-vote').css('background-color', jQuery.Color(r,g,b).toHexString(false))
 
   hoverControl = new OpenLayers.Control.SelectFeature @vectorLayer,
       renderIntent: 'hover', autoActivate: true, hover: true, highlightOnly: true
