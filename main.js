@@ -1,11 +1,32 @@
 (function() {
-  var createColourSwatch,
+  var barycentricCoordToColour, createColourSwatch, r1, r2, r3, r4, resultsToBarycentric, t,
     __hasProp = {}.hasOwnProperty;
 
-  createColourSwatch = function(t, r4) {
+  r1 = [146, 0, 13];
+
+  r2 = [253, 187, 48];
+
+  r3 = [0, 135, 220];
+
+  r4 = [0, 0, 0];
+
+  t = [[r1[0] - r4[0], r1[1] - r4[1], r1[2] - r4[2]], [r2[0] - r4[0], r2[1] - r4[1], r2[2] - r4[2]], [r3[0] - r4[0], r3[1] - r4[1], r3[2] - r4[2]]];
+
+  barycentricCoordToColour = function(l1, l2, l3) {
+    var b, g, r;
+    r = l1 * t[0][0] + l2 * t[1][0] + l3 * t[2][0] + r4[0];
+    g = l1 * t[0][1] + l2 * t[1][1] + l3 * t[2][1] + r4[1];
+    b = l1 * t[0][2] + l2 * t[1][2] + l3 * t[2][2] + r4[2];
+    return [r, g, b];
+  };
+
+  createColourSwatch = function(elems, ordering) {
     var _this = this;
-    return $('canvas#colour-swatch').each(function(idx, elem) {
-      var b, col, ctx, g, imageData, l1, l2, l3, l4, n, nx, ny, r, row, s, _i, _j, _ref, _ref1;
+    if (ordering == null) {
+      ordering = [0, 1, 3, 2];
+    }
+    return elems.each(function(idx, elem) {
+      var b, bl, br, col, ctx, g, imageData, l, l1, l2, l3, l4, n, nx, ny, r, row, s, tl, tr, _i, _j, _ref, _ref1, _ref2;
       ctx = elem.getContext('2d');
       imageData = ctx.createImageData(ctx.canvas.width, ctx.canvas.height);
       for (row = _i = 0, _ref = imageData.height; 0 <= _ref ? _i < _ref : _i > _ref; row = 0 <= _ref ? ++_i : --_i) {
@@ -14,17 +35,24 @@
           s = 1;
           nx = s * col / imageData.width;
           ny = s * row / imageData.height;
-          l1 = Math.max(0, 1 - Math.sqrt(nx * nx + ny * ny));
-          l2 = Math.max(0, 1 - Math.sqrt((s - nx) * (s - nx) + ny * ny));
-          l3 = Math.max(0, 1 - Math.sqrt((s - nx) * (s - nx) + (s - ny) * (s - ny)));
-          l4 = Math.max(0, 1 - Math.sqrt(nx * nx + (s - ny) * (s - ny)));
+          tl = Math.max(0, 1 - Math.sqrt(nx * nx + ny * ny));
+          tr = Math.max(0, 1 - Math.sqrt((s - nx) * (s - nx) + ny * ny));
+          br = Math.max(0, 1 - Math.sqrt((s - nx) * (s - nx) + (s - ny) * (s - ny)));
+          bl = Math.max(0, 1 - Math.sqrt(nx * nx + (s - ny) * (s - ny)));
+          l = [0, 0, 0, 0];
+          l[ordering[0]] = tl;
+          l[ordering[1]] = tr;
+          l[ordering[2]] = bl;
+          l[ordering[3]] = br;
+          l1 = l[0];
+          l2 = l[1];
+          l3 = l[2];
+          l4 = l[3];
           n = l1 + l2 + l3 + l4;
           l1 /= n;
           l2 /= n;
           l3 /= n;
-          r = l1 * t[0][0] + l2 * t[1][0] + l3 * t[2][0] + r4[0];
-          g = l1 * t[0][1] + l2 * t[1][1] + l3 * t[2][1] + r4[1];
-          b = l1 * t[0][2] + l2 * t[1][2] + l3 * t[2][2] + r4[2];
+          _ref2 = barycentricCoordToColour(l1, l2, l3), r = _ref2[0], g = _ref2[1], b = _ref2[2];
           imageData.data[idx + 0] = r;
           imageData.data[idx + 1] = g;
           imageData.data[idx + 2] = b;
@@ -35,18 +63,47 @@
     });
   };
 
+  resultsToBarycentric = function(results, normalise) {
+    var k, l1, l2, l3, l4, s, v;
+    if (normalise == null) {
+      normalise = true;
+    }
+    l1 = l2 = l3 = l4 = 0;
+    for (k in results) {
+      if (!__hasProp.call(results, k)) continue;
+      v = results[k];
+      switch (k) {
+        case 'Lab':
+          l1 += v;
+          break;
+        case 'LD':
+          l2 += v;
+          break;
+        case 'Con':
+          l3 += v;
+          break;
+        default:
+          l4 += v;
+      }
+    }
+    if (normalise) {
+      s = l1 + l2 + l3 + l4;
+      l1 /= s;
+      l2 /= s;
+      l3 /= s;
+      l4 /= s;
+    }
+    return [l1, l2, l3, l4];
+  };
+
   $(function() {
-    var defaultContext, defaultStyle, hoverControl, hoverFeature, hoverStyle, r1, r2, r3, r4, selectControl, styles, t,
+    var defaultContext, defaultStyle, hoverControl, hoverFeature, hoverStyle, selectControl, selectStyle, styles,
       _this = this;
     this.map = new OpenLayers.Map('constituency-map');
     this.map.addLayer(new OpenLayers.Layer.OSM);
     this.map.zoomToMaxExtent();
-    r1 = [192, 0, 0];
-    r2 = [255, 210, 0];
-    r3 = [0, 0, 192];
-    r4 = [0, 192, 0];
-    t = [[r1[0] - r4[0], r1[1] - r4[1], r1[2] - r4[2]], [r2[0] - r4[0], r2[1] - r4[1], r2[2] - r4[2]], [r3[0] - r4[0], r3[1] - r4[1], r3[2] - r4[2]]];
-    createColourSwatch(t, r4);
+    createColourSwatch($('canvas#colour-swatch-1'), [0, 1, 3, 2]);
+    createColourSwatch($('canvas#colour-swatch-2'), [0, 1, 2, 3]);
     defaultStyle = {
       fillColor: '${getFillColor}',
       strokeColor: '#000000',
@@ -55,34 +112,26 @@
     };
     defaultContext = {
       getFillColor: function(f) {
-        var b, con, g, k, l1, l2, l3, lab, ld, r, results, sum_vote, v;
+        var b, g, l1, l2, l3, l4, r, results, _ref, _ref1;
         results = f.attributes.results || {};
-        sum_vote = 0;
-        for (k in results) {
-          if (!__hasProp.call(results, k)) continue;
-          v = results[k];
-          sum_vote += v;
-        }
-        con = results.Con || 0;
-        lab = results.Lab || 0;
-        ld = results.LD || 0;
-        l1 = lab / sum_vote;
-        l2 = ld / sum_vote;
-        l3 = con / sum_vote;
-        r = l1 * t[0][0] + l2 * t[1][0] + l3 * t[2][0] + r4[0];
-        g = l1 * t[0][1] + l2 * t[1][1] + l3 * t[2][1] + r4[1];
-        b = l1 * t[0][2] + l2 * t[1][2] + l3 * t[2][2] + r4[2];
+        _ref = resultsToBarycentric(results), l1 = _ref[0], l2 = _ref[1], l3 = _ref[2], l4 = _ref[3];
+        _ref1 = barycentricCoordToColour(l1, l2, l3), r = _ref1[0], g = _ref1[1], b = _ref1[2];
         return jQuery.Color(r, g, b).toHexString(false);
       }
     };
     hoverStyle = new OpenLayers.Style({
-      fillColor: '#339933'
+      fillColor: '#A3C1AD'
+    });
+    selectStyle = new OpenLayers.Style({
+      strokeColor: '#0000ee',
+      strokeWidth: 3
     });
     styles = {
       "default": new OpenLayers.Style(defaultStyle, {
         context: defaultContext
       }),
-      hover: hoverStyle
+      hover: hoverStyle,
+      select: selectStyle
     };
     this.vectorLayer = new OpenLayers.Layer.Vector('Constituencies', {
       styleMap: new OpenLayers.StyleMap(styles, {
@@ -98,7 +147,27 @@
       })
     });
     this.vectorLayer.events.register('loadend', null, function() {
-      return _this.map.zoomToExtent(_this.vectorLayer.getDataExtent());
+      var b, f, g, l1, l1_, l2, l2_, l3, l3_, l4, l4_, r, results, s, _i, _len, _ref, _ref1, _ref2;
+      _this.map.zoomToExtent(_this.vectorLayer.getDataExtent());
+      l1 = l2 = l3 = l4 = 0;
+      _ref = _this.vectorLayer.features;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        f = _ref[_i];
+        results = f.attributes.results || {};
+        _ref1 = resultsToBarycentric(results, false), l1_ = _ref1[0], l2_ = _ref1[1], l3_ = _ref1[2], l4_ = _ref1[3];
+        l1 += l1_;
+        l2 += l2_;
+        l3 += l3_;
+        l4 += l4_;
+      }
+      $('#popular-vote-caption').html('Con:&nbsp;' + l3 + ', Lab:&nbsp;' + l1 + ', LD:&nbsp;' + l2 + ', Oth:&nbsp;' + l4);
+      s = l1 + l2 + l3 + l4;
+      l1 /= s;
+      l2 /= s;
+      l3 /= s;
+      l4 /= s;
+      _ref2 = barycentricCoordToColour(l1, l2, l3), r = _ref2[0], g = _ref2[1], b = _ref2[2];
+      return $('#popular-vote').css('background-color', jQuery.Color(r, g, b).toHexString(false));
     });
     hoverControl = new OpenLayers.Control.SelectFeature(this.vectorLayer, {
       renderIntent: 'hover',
@@ -108,7 +177,6 @@
     });
     hoverFeature = null;
     selectControl = new OpenLayers.Control.SelectFeature(this.vectorLayer, {
-      renderIntent: 'hover',
       autoActivate: true,
       onSelect: function(f) {
         var description_html, k, popup, v, _ref;
